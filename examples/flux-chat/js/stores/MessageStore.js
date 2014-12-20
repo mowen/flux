@@ -58,6 +58,11 @@ var MessageStore = assign({}, EventEmitter.prototype, {
     this.removeListener(CHANGE_EVENT, callback);
   },
 
+  generateMessageID: function(timestamp) {
+    // timestamp = timestamp || Date.now();
+    return 'm_' + timestamp || Date.now();
+  },
+
   get: function(id) {
     return _messages[id];
   },
@@ -94,7 +99,7 @@ var MessageStore = assign({}, EventEmitter.prototype, {
   getCreatedMessageData: function(text) {
     var timestamp = Date.now();
     return {
-      id: 'm_' + timestamp,
+      id: this.generateMessageID(timestamp),
       threadID: ThreadStore.getCurrentID(),
       authorName: 'Bill', // hard coded for the example
       date: new Date(timestamp),

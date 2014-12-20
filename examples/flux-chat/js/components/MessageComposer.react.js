@@ -11,6 +11,7 @@
  */
 
 var ChatMessageActionCreators = require('../actions/ChatMessageActionCreators');
+var ChatThreadActionCreators = require('../actions/ChatThreadActionCreators');
 var React = require('react');
 
 var ENTER_KEY_CODE = 13;
@@ -23,13 +24,18 @@ var MessageComposer = React.createClass({
 
   render: function() {
     return (
-      <textarea
-        className="message-composer"
-        name="message"
-        value={this.state.text}
-        onChange={this._onChange}
-        onKeyDown={this._onKeyDown}
-      />
+      <div>
+        <textarea
+          className="message-composer"
+          name="message"
+          value={this.state.text}
+          onChange={this._onChange}
+          onKeyDown={this._onKeyDown}
+        />
+        <button
+          name="new-thread"
+          onClick={this._onClickNewThread}>New Thread</button>
+      </div>
     );
   },
 
@@ -46,6 +52,11 @@ var MessageComposer = React.createClass({
       }
       this.setState({text: ''});
     }
+  },
+
+  _onClickNewThread: function(event) {
+    var text = this.state.text.trim();
+    ChatThreadActionCreators.createThread(text);
   }
 
 });

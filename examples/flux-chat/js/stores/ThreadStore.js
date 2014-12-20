@@ -39,11 +39,19 @@ var ThreadStore = assign({}, EventEmitter.prototype, {
     }, this);
 
     if (!_currentID) {
-      var allChrono = this.getAllChrono();
-      _currentID = allChrono[allChrono.length - 1].id;
+      _currentID = this._mostRecentThreadID();
     }
 
     _threads[_currentID].lastMessage.isRead = true;
+  },
+
+  _mostRecentThreadID: function() {
+    var allChrono = this.getAllChrono();
+    return allChrono[allChrono.length - 1].id;
+  },
+
+  generateThreadID: function(timestamp) {
+    return 't_' + timestamp || Date.now();
   },
 
   emitChange: function() {
@@ -98,6 +106,18 @@ var ThreadStore = assign({}, EventEmitter.prototype, {
 
   getCurrent: function() {
     return this.get(this.getCurrentID());
+  },
+
+  createNewCurrentThreadID: function() {
+    _currentID = this.generateThreadID();
+  },
+
+  getCreatedThreadData: function(message) {
+    return {
+      id: message.threadID,
+      name: message.threadName,
+      lastMessage: message
+    }
   }
 
 });
@@ -110,6 +130,12 @@ ThreadStore.dispatchToken = ChatAppDispatcher.register(function(payload) {
     case ActionTypes.CLICK_THREAD:
       _currentID = action.threadID;
       _threads[_currentID].lastMessage.isRead = true;
+      ThreadStore.emitChange();
+      break;
+
+    case ActionTypes.CREATE_THREAD:
+      thread = ThreadStore.getCreatedThreadData(action.message);
+      _threads[_currentID] = thread;
       ThreadStore.emitChange();
       break;
 

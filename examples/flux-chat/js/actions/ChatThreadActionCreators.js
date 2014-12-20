@@ -12,6 +12,9 @@
 
 var ChatAppDispatcher = require('../dispatcher/ChatAppDispatcher');
 var ChatConstants = require('../constants/ChatConstants');
+var ChatWebAPIUtils = require('../utils/ChatWebAPIUtils');
+var ThreadStore = require('../stores/ThreadStore');
+var MessageStore = require('../stores/MessageStore');
 
 var ActionTypes = ChatConstants.ActionTypes;
 
@@ -21,6 +24,18 @@ module.exports = {
     ChatAppDispatcher.handleViewAction({
       type: ActionTypes.CLICK_THREAD,
       threadID: threadID
+    });
+  },
+
+  createThread: function(text) {
+    ThreadStore.createNewCurrentThreadID();
+
+    var message = MessageStore.getCreatedMessageData(text);
+    ChatWebAPIUtils.createMessage(message);
+
+    ChatAppDispatcher.handleViewAction({
+      type: ActionTypes.CREATE_THREAD,
+      message: message
     });
   }
 
